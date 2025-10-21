@@ -99,7 +99,9 @@ async def control_lg_device_endpoint(data: dict):
 
         # 공기청정기
         if action == "clean":
-            command = {"airPurifierJobMode": {"currentJobMode": "CLEAN"}}
+            command = {
+                "airPurifierJobMode": {
+                    "currentJobMode": "CLEAN"}}
         elif action == "auto":
             command = {"airPurifierJobMode": {"currentJobMode": "AUTO"}}
         elif action == "turn_on":
@@ -107,6 +109,32 @@ async def control_lg_device_endpoint(data: dict):
         elif action == "turn_off":
             command = {"airPurifierOperation": {"airPurifierOperationMode": "POWER_OFF"}}
 
+
+        # 건조기
+        elif action == "dryer_on":
+            command = {
+                "operation": {
+                    "dryerOperationMode": "POWER_ON"
+                }
+            }
+        elif action == "dryer_off":
+            command = {
+                "operation": {
+                    "dryerOperationMode": "POWER_OFF"
+                }
+            }
+        elif action == "dryer_start":
+            command = {
+                "operation": {
+                    "dryerOperationMode": "START"
+                }
+            }
+        elif action == "dryer_stop":
+            command = {
+                "operation": {
+                    "dryerOperationMode": "STOP"
+                }
+            }
         # # 에어컨
         # elif action == "aircon_on":
         #     command = {"dataKey": "airState.operation", "dataValue": "1"}
