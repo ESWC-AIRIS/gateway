@@ -66,23 +66,15 @@ async def get_lg_device_profile(device_id: str):
         logger.error(f"LG 기기 프로필 조회 실패: {e}")
         return {"error": str(e)}
     
-    
-# @app.post("/api/lg/control")
-# async def control_lg_device_endpoint(data: dict):
-#     """LG 기기 제어"""
+# @app.get("/api/lg/devices/{device_id}/state")
+# async def get_lg_device_state(device_id: str):
+#     """기기 현재 상태 조회"""
 #     try:
-#         device_id = data.get("device_id")
-#         command = data.get("command")
-
-#         if not device_id or not command:
-#             return {"error": "device_id and command required"}
-
-#         result = await control_lg_device(device_id, command)
+#         result = await get_device_state(device_id)
 #         return result
 #     except Exception as e:
-#         logger.error(f"LG 기기 제어 실패: {e}")
+#         logger.error(f"LG 기기 현재 상태 조회 실패: {e}")
 #         return {"error": str(e)}
-
 
 @app.post("/api/lg/control")
 async def control_lg_device_endpoint(data: dict):
@@ -135,14 +127,14 @@ async def control_lg_device_endpoint(data: dict):
                     "dryerOperationMode": "STOP"
                 }
             }
-        # # 에어컨
-        # elif action == "aircon_on":
-        #     command = {"dataKey": "airState.operation", "dataValue": "1"}
-        # elif action == "aircon_off":
-        #     command = {"dataKey": "airState.operation", "dataValue": "0"}
-        # elif action.startswith("temp_"):
-        #     temp = action.split("_")[1]
-        #     command = {"dataKey": "airState.tempState.target", "dataValue": temp}
+        # 에어컨
+        elif action == "aircon_on":
+            command = {"dataKey": "airState.operation", "dataValue": "1"}
+        elif action == "aircon_off":
+            command = {"dataKey": "airState.operation", "dataValue": "0"}
+        elif action.startswith("temp_"):
+            temp = action.split("_")[1]
+            command = {"dataKey": "airState.tempState.target", "dataValue": temp}
 
         else:
             return {"error": f"Unknown action: {action}"}

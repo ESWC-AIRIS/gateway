@@ -145,3 +145,28 @@ async def get_device_profile(device_id: str):
     except Exception as e:
         logger.error(f"기타 에러: {str(e)}")
         return {"error": str(e)}
+    
+
+# async def get_device_state(device_id: str):
+#     """기기 현재 상태 조회"""    
+#     if not LG_PAT_TOKEN:
+#         return {"error": "LG_PAT_TOKEN not configured"}
+    
+#     headers = generate_api_header()
+    
+#     try:
+#         async with httpx.AsyncClient() as client:
+#             response = await client.get(
+#                 f"{LG_BASE_URL}/devices/{device_id}/state",
+#                 headers=headers,
+#                 timeout=30.0
+#             )
+            
+#             response.raise_for_status()
+#             return response.json()
+    
+#     except httpx.HTTPStatusError as e:
+#         logger.error(f"HTTP 에러: {e.response.status_code}")
+#         logger.error(f"응답 본문: {e.response.text}")
+#         return {"error": f"HTTP {e.response.status_code}: {e.response.text[:200]}"}
+    
