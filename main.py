@@ -95,12 +95,23 @@ async def control_lg_device_endpoint(data: dict):
                 "airPurifierJobMode": {
                     "currentJobMode": "CLEAN"}}
         elif action == "auto":
-            command = {"airPurifierJobMode": {"currentJobMode": "AUTO"}}
+            command = {
+                "airPurifierJobMode": {
+                    "currentJobMode": "AUTO"
+                    }
+                }
         elif action == "turn_on":
-            command = {"airPurifierOperation": {"airPurifierOperationMode": "POWER_ON"}}
+            command = {
+                "airPurifierOperation": {
+                    "airPurifierOperationMode": "POWER_ON"
+                    }
+                }
         elif action == "turn_off":
-            command = {"airPurifierOperation": {"airPurifierOperationMode": "POWER_OFF"}}
-
+            command = {
+                "airPurifierOperation": {
+                    "airPurifierOperationMode": "POWER_OFF"
+                    }
+                }
 
         # 건조기
         elif action == "dryer_on":
@@ -127,15 +138,27 @@ async def control_lg_device_endpoint(data: dict):
                     "dryerOperationMode": "STOP"
                 }
             }
+            
         # 에어컨
         elif action == "aircon_on":
-            command = {"dataKey": "airState.operation", "dataValue": "1"}
+            command = {
+                "operation":{
+                    "airconOperationMode": "POWER_ON"
+                }
+            }
         elif action == "aircon_off":
-            command = {"dataKey": "airState.operation", "dataValue": "0"}
+            command = {
+                "operation": {
+                    "airconOperationMode": "POWER_OFF"
+                }
+            }
         elif action.startswith("temp_"):
-            temp = action.split("_")[1]
-            command = {"dataKey": "airState.tempState.target", "dataValue": temp}
-
+            temp = float(action.split("_")[1])
+            command = {
+                "temperature": {
+                    "targetTemperature": temp
+                }
+            }
         else:
             return {"error": f"Unknown action: {action}"}
 
