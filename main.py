@@ -143,13 +143,13 @@ async def control_lg_device_endpoint(data: dict):
         elif action == "aircon_on":
             command = {
                 "operation":{
-                    "airconOperationMode": "POWER_ON"
+                    "airConOperationMode": "POWER_ON"
                 }
             }
         elif action == "aircon_off":
             command = {
                 "operation": {
-                    "airconOperationMode": "POWER_OFF"
+                    "airConOperationMode": "POWER_OFF"
                 }
             }
         elif action.startswith("temp_"):
@@ -174,3 +174,5 @@ async def control_lg_device_endpoint(data: dict):
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8001)
+    
+    
