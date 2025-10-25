@@ -1,0 +1,33 @@
+name: Deploy to AWS EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 배포 시작
+        run: echo "Starting deployment..."
+
+      - name: AWS EC2 배포
+        uses: appleboy/ssh-action@v1.0.0
+        with: 
+          host: ${{ secrets.AWS_HOST }}
+          username: ${{ secrets.AWS_USERNAME }}
+          key: ${{ secrets.AWS_SSH_KEY }}
+          port: 22
+          script: |
+            cd ~/gateway
+            git pull origin main
+            docker compose down
+            docker compose up -d --build
+            docker ps
+
+      - name: 배포 완료
+        run: echo "Deployment Completed!"
+        
+                  
