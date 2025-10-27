@@ -110,11 +110,19 @@ async def control_lg_device_endpoint(data: dict):
         if action == "clean":
             command = {
                 "airPurifierJobMode": {
-                    "currentJobMode": "CLEAN"}}
+                    "currentJobMode": "CLEAN"
+                    }
+                }
         elif action == "auto":
             command = {
                 "airPurifierJobMode": {
                     "currentJobMode": "AUTO"
+                    }
+                }
+        elif action == "circulator":
+            command = {
+                "airPurifierJobMode": {
+                    "currentJobMode": "CIRCULATOR"
                     }
                 }
         elif action == "purifier_on":
