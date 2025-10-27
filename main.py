@@ -137,6 +137,39 @@ async def control_lg_device_endpoint(data: dict):
                     "airPurifierOperationMode": "POWER_OFF"
                     }
                 }
+        # 공기청정기 - 바람 세기 (airFlow)
+        elif action == "wind_low":
+            command = {
+                "airFlow": {
+                    "windStrength": "LOW"
+                }
+            }
+        elif action == "wind_mid":
+            command = {
+                "airFlow": {
+                    "windStrength": "MID"
+                }
+            }
+        elif action == "wind_high":
+            command = {
+                "airFlow": {
+                    "windStrength": "HIGH"
+                }
+            }
+        elif action == "wind_auto":
+            command = {
+                "airFlow": {
+                    "windStrength": "AUTO"
+                }
+            }
+        elif action == "wind_power":
+            command = {
+                "airFlow": {
+                    "windStrength": "POWER"
+                }
+            }
+
+
 
         # 건조기
         elif action == "dryer_on":
