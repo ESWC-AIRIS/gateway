@@ -7,8 +7,14 @@ from fastapi.middleware.cors import CORSMiddleware
 import httpx
 import json
 import logging
+import os
 from datetime import datetime
-from lg_client import get_lg_devices, control_lg_device, get_device_profile, get_device_state
+from dotenv import load_dotenv
+from lg_client import get_lg_devices, control_lg_device, get_device_profile, get_device_state, get_device_status
+
+# 환경변수 로드
+load_dotenv()
+
 # 로깅 설정
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -26,6 +32,7 @@ app.add_middleware(
 
 # 설정
 AI_SERVICE_URL = "http://localhost:8000"  # AI Service
+DEBUG_MODE = os.getenv("DEBUG_MODE", "false").lower() == "true"
 
 
 @app.get("/")
@@ -64,17 +71,27 @@ async def get_lg_device_profile(device_id: str):
     except Exception as e:
         logger.error(f"LG 기기 프로필 조회 실패: {e}")
         return {"error": str(e)}
-    
-@app.get("/api/lg/devices/{device_id}/state")
-async def get_lg_device_state(device_id: str):
-    """기기 현재 상태 조회"""
+
+if DEBUG_MODE:
+    @app.get("/api/lg/devices/{device_id}/state")
+    async def get_lg_device_state(device_id: str):
+        """기기 현재 상태 조회 (debug mode)"""
+        try:
+            result = await get_device_state(device_id)
+            return result
+        except Exception as e:
+            logger.error(f"LG 기기 현재 상태 조회 실패: {e}")
+            return {"error": str(e)}
+
+@app.get("/api/lg/devices/{device_id}/status")
+async def get_simple_device_status(device_id: str, device_name: str = None):
+    """기기 상태 간단 요약 (ON/OFF, 온도 등)"""
     try:
-        result = await get_device_state(device_id)
+        result = await get_device_status(device_id, device_name)
         return result
     except Exception as e:
-        logger.error(f"LG 기기 현재 상태 조회 실패: {e}")
+        logger.error(f"간단 상태 조회 실패: {e}")
         return {"error": str(e)}
-
 
 @app.post("/api/lg/control")
 async def control_lg_device_endpoint(data: dict):

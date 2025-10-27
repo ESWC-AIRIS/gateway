@@ -174,3 +174,64 @@ async def get_device_state(device_id: str):
         logger.error(f"기타 에러: {str(e)}")
         return {"error": str(e)}
 
+
+async def get_device_status(device_id: str, device_name: str = None):
+    """기기 상태 간단 요약"""
+
+    # 전체 상태 조회
+    state_response = await get_device_state(device_id)
+
+    if "error" in state_response:
+        return state_response
+
+    state = state_response.get("response", {})
+
+    # 기기별 요약 정보 추출
+    simple_status = {
+        "device_id": device_id,
+        "device_name": device_name or device_id[:8] + "...",
+    }
+
+    # 에어컨
+    if "airConJobMode" in state or ("operation" in state and "airConOperationMode" in state.get("operation", {})):
+        operation = state.get("operation", {})
+        temp = state.get("temperature", {})
+
+        simple_status.update({
+            "type": "aircon",
+            "power": operation.get("airConOperationMode", "UNKNOWN"),
+            "mode": state.get("airConJobMode", {}).get("currentJobMode", "N/A"),
+            "current_temp": temp.get("currentTemperature", "N/A"),
+            "target_temp": temp.get("targetTemperature", "N/A"),
+            "wind_strength": state.get("airFlow", {}).get("windStrength", "N/A")
+        })
+
+    # 공기청정기
+    elif "airPurifierJobMode" in state or ("operation" in state and "airPurifierOperationMode" in state.get("operation", {})):
+        operation = state.get("operation", {})
+
+        simple_status.update({
+            "type": "air_purifier",
+            "power": operation.get("airPurifierOperationMode", "UNKNOWN"),
+            "mode": state.get("airPurifierJobMode", {}).get("currentJobMode", "N/A"),
+            "air_quality": state.get("airQuality", {}).get("overall", "N/A")
+        })
+
+    # 건조기
+    elif "operation" in state and "dryerOperationMode" in state.get("operation", {}):
+        operation = state.get("operation", {})
+
+        simple_status.update({
+            "type": "dryer",
+            "power": operation.get("dryerOperationMode", "UNKNOWN"),
+            "state": state.get("runState", {}).get("currentState", "N/A")
+        })
+
+    # 알 수 없는 기기
+    else:
+        simple_status.update({
+            "type": "unknown",
+            "raw_state": state
+        })
+
+    return simple_status
