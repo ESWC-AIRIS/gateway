@@ -217,6 +217,61 @@ async def control_lg_device_endpoint(data: dict):
                     "targetTemperature": temp
                 }
             }
+        # 에어컨 - 바람 세기
+        elif action == "aircon_wind_low":
+            command = {
+                "airFlow": {
+                    "windStrength": "LOW"
+                }
+            }
+        elif action == "aircon_wind_mid":
+            command = {
+                "airFlow": {
+                    "windStrength": "MID"
+                }
+            }
+        elif action == "aircon_wind_high":
+            command = {
+                "airFlow": {
+                    "windStrength": "HIGH"
+                }
+            }
+        elif action == "aircon_wind_auto":
+            command = {
+                "airFlow": {
+                    "windStrength": "AUTO"
+                }
+            }
+        # 타이머 start
+        elif action.startswith("aircon_timer_start_"):
+            try:
+                time_str = action.split("_")[3] 
+                if len(time_str) != 4:
+                    return {"error": "시간 형식은 HHMM (4자리), 예: 0700"}
+                hour, minute = time_str[:2], time_str[2:]
+                command = {
+                    "timer": {
+                        "absoluteHourToStart": int(hour),
+                        "absoluteMinuteToStart": int(minute)
+                    }
+                }
+            except (IndexError, ValueError) as e:
+                return {"error": f"유효하지 않은 aircon_timer_start 포맷입니다. 'aircon_timer_start_HHMM' 형식으로 입력하세요."}
+        # 타이머 stop 
+        elif action.startswith("aircon_timer_stop_"):
+            try:
+                time_str = action.split("_")[3] 
+                if len(time_str) != 4:
+                    return {"error": "시간 형식은 HHMM (4자리), 예: 2130"}
+                hour, minute = time_str[:2], time_str[2:]
+                command = {
+                    "timer": {
+                        "absoluteHourToStop": int(hour),
+                        "absoluteMinuteToStop": int(minute)
+                    }
+                }
+            except (IndexError, ValueError) as e:
+                return {"error": f"유효하지 않은 aircon_timer_stop 포맷입니다. 'aircon_timer_stop_HHMM' 형식으로 입력하세요."}
         else:
             return {"error": f"Unknown action: {action}"}
 
