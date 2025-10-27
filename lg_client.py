@@ -208,13 +208,20 @@ async def get_device_status(device_id: str, device_name: str = None):
 
     # 공기청정기
     elif "airPurifierJobMode" in state or ("operation" in state and "airPurifierOperationMode" in state.get("operation", {})):
-        operation = state.get("operation", {})
+        air_sensor = state.get("airQualitySensor", {})
 
         simple_status.update({
             "type": "air_purifier",
-            "power": operation.get("airPurifierOperationMode", "UNKNOWN"),
+            "power": state.get("operation", {}).get("airPurifierOperationMode", "UNKNOWN"),
             "mode": state.get("airPurifierJobMode", {}).get("currentJobMode", "N/A"),
-            "air_quality": state.get("airQuality", {}).get("overall", "N/A")
+            "wind_strength": state.get("airFlow", {}).get("windStrength", "N/A"),
+            "air_quality": {
+                "PM1": air_sensor.get("PM1", "N/A"),
+                "PM2": air_sensor.get("PM2", "N/A"),
+                "PM10": air_sensor.get("PM10", "N/A"),
+                "oder": air_sensor.get("oder", "N/A"),
+                "total_pollution": air_sensor.get("totalPollution", "N/A")
+            }
         })
 
     # 건조기
