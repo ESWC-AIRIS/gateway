@@ -189,21 +189,21 @@ async def get_device_status(device_id: str, device_name: str = None):
     # 기기별 요약 정보 추출
     simple_status = {
         "device_id": device_id,
-        "device_name": device_name or device_id[:8] + "...",
+        # "device_name": device_name or device_id[:8] + "...",
     }
 
     # 에어컨
     if "airConJobMode" in state or ("operation" in state and "airConOperationMode" in state.get("operation", {})):
         operation = state.get("operation", {})
         temp = state.get("temperature", {})
-
+        
         simple_status.update({
             "type": "aircon",
             "power": operation.get("airConOperationMode", "UNKNOWN"),
             "mode": state.get("airConJobMode", {}).get("currentJobMode", "N/A"),
             "current_temp": temp.get("currentTemperature", "N/A"),
             "target_temp": temp.get("targetTemperature", "N/A"),
-            "wind_strength": state.get("airFlow", {}).get("windStrength", "N/A")
+            "wind_strength": state.get("airFlow", {}).get("windStrength", "N/A"),
         })
 
     # 공기청정기

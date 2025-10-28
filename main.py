@@ -242,6 +242,25 @@ async def control_lg_device_endpoint(data: dict):
                     "windStrength": "AUTO"
                 }
             }
+        elif action == "aircon_clean":
+            command = { 
+                "airConJobMode": {
+                    "currentJobMode": "AIR_CLEAN"                       
+                }
+            }
+        elif action == "aircon_dry":
+            command = {
+                "airConJobMode": {
+                    "currentJobMode": "AIR_DRY"
+                }
+            }
+        elif action == "aircon_cool":
+            command = {
+                "airConJobMode": {
+                    "currentJobMode": "COOL"
+                }
+            }
+        
         # 타이머 start
         elif action.startswith("aircon_timer_start_"):
             try:
