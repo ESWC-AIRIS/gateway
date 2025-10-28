@@ -104,6 +104,15 @@ async def control_lg_device_endpoint(data: dict):
         if not device_id or not action:
             return {"error": "device_id and action required"}
 
+        # 공기청정기 바람 세기 명령은 AUTO 모드에서 작동 안 하므로 먼저 CLEAN 모드로 변경
+        if action.startswith("wind_") and action != "wind_auto":
+            logger.info(f"바람 세기 변경 요청: {action} - 먼저 CLEAN 모드로 전환")
+            clean_command = {"airPurifierJobMode": {"currentJobMode": "CLEAN"}}
+            await control_lg_device(device_id, clean_command)
+            # 모드 변경 후 잠시 대기
+            import asyncio
+            await asyncio.sleep(0.5)
+
         # 액션을 LG 명령어로 변환
         try:
             command = action_to_command(action)
