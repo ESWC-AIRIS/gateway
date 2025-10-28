@@ -11,6 +11,7 @@ import os
 from datetime import datetime
 from dotenv import load_dotenv
 from lg_client import get_lg_devices, control_lg_device, get_device_profile, get_device_state, get_device_status
+from action_mapper import action_to_command
 
 # 환경변수 로드
 load_dotenv()
@@ -104,196 +105,12 @@ async def control_lg_device_endpoint(data: dict):
             return {"error": "device_id and action required"}
 
         # 액션을 LG 명령어로 변환
-        command = None
+        try:
+            command = action_to_command(action)
+        except ValueError as e:
+            return {"error": str(e)}
 
-        # 공기청정기
-        if action == "clean":
-            command = {
-                "airPurifierJobMode": {
-                    "currentJobMode": "CLEAN"
-                    }
-                }
-        elif action == "auto":
-            command = {
-                "airPurifierJobMode": {
-                    "currentJobMode": "AUTO"
-                    }
-                }
-        elif action == "circulator":
-            command = {
-                "airPurifierJobMode": {
-                    "currentJobMode": "CIRCULATOR"
-                    }
-                }
-        elif action == "purifier_on":
-            command = {
-                "operation": {
-                    "airPurifierOperationMode": "POWER_ON"
-                    }
-                }
-        elif action == "purifier_off":
-            command = {
-                "operation": {
-                    "airPurifierOperationMode": "POWER_OFF"
-                    }
-                }
-        # 공기청정기 - 바람 세기 (airFlow)
-        elif action == "wind_low":
-            command = {
-                "airFlow": {
-                    "windStrength": "LOW"
-                }
-            }
-        elif action == "wind_mid":
-            command = {
-                "airFlow": {
-                    "windStrength": "MID"
-                }
-            }
-        elif action == "wind_high":
-            command = {
-                "airFlow": {
-                    "windStrength": "HIGH"
-                }
-            }
-        elif action == "wind_auto":
-            command = {
-                "airFlow": {
-                    "windStrength": "AUTO"
-                }
-            }
-        elif action == "wind_power":
-            command = {
-                "airFlow": {
-                    "windStrength": "POWER"
-                }
-            }
-
-
-
-        # 건조기
-        elif action == "dryer_on":
-            command = {
-                "operation": {
-                    "dryerOperationMode": "POWER_ON"
-                }
-            }
-        elif action == "dryer_off":
-            command = {
-                "operation": {
-                    "dryerOperationMode": "POWER_OFF"
-                }
-            }
-        elif action == "dryer_start":
-            command = {
-                "operation": {
-                    "dryerOperationMode": "START"
-                }
-            }
-        elif action == "dryer_stop":
-            command = {
-                "operation": {
-                    "dryerOperationMode": "STOP"
-                }
-            }
-            
-        # 에어컨
-        elif action == "aircon_on":
-            command = {
-                "operation":{
-                    "airConOperationMode": "POWER_ON"
-                }
-            }
-        elif action == "aircon_off":
-            command = {
-                "operation": {
-                    "airConOperationMode": "POWER_OFF"
-                }
-            }
-        elif action.startswith("temp_"):
-            temp = float(action.split("_")[1])
-            command = {
-                "temperature": {
-                    "targetTemperature": temp
-                }
-            }
-        # 에어컨 - 바람 세기
-        elif action == "aircon_wind_low":
-            command = {
-                "airFlow": {
-                    "windStrength": "LOW"
-                }
-            }
-        elif action == "aircon_wind_mid":
-            command = {
-                "airFlow": {
-                    "windStrength": "MID"
-                }
-            }
-        elif action == "aircon_wind_high":
-            command = {
-                "airFlow": {
-                    "windStrength": "HIGH"
-                }
-            }
-        elif action == "aircon_wind_auto":
-            command = {
-                "airFlow": {
-                    "windStrength": "AUTO"
-                }
-            }
-        elif action == "aircon_clean":
-            command = { 
-                "airConJobMode": {
-                    "currentJobMode": "AIR_CLEAN"                       
-                }
-            }
-        elif action == "aircon_dry":
-            command = {
-                "airConJobMode": {
-                    "currentJobMode": "AIR_DRY"
-                }
-            }
-        elif action == "aircon_cool":
-            command = {
-                "airConJobMode": {
-                    "currentJobMode": "COOL"
-                }
-            }
-        
-        # 타이머 start
-        elif action.startswith("aircon_timer_start_"):
-            try:
-                time_str = action.split("_")[3] 
-                if len(time_str) != 4:
-                    return {"error": "시간 형식은 HHMM (4자리), 예: 0700"}
-                hour, minute = time_str[:2], time_str[2:]
-                command = {
-                    "timer": {
-                        "absoluteHourToStart": int(hour),
-                        "absoluteMinuteToStart": int(minute)
-                    }
-                }
-            except (IndexError, ValueError) as e:
-                return {"error": f"유효하지 않은 aircon_timer_start 포맷입니다. 'aircon_timer_start_HHMM' 형식으로 입력하세요."}
-        # 타이머 stop 
-        elif action.startswith("aircon_timer_stop_"):
-            try:
-                time_str = action.split("_")[3] 
-                if len(time_str) != 4:
-                    return {"error": "시간 형식은 HHMM (4자리), 예: 2130"}
-                hour, minute = time_str[:2], time_str[2:]
-                command = {
-                    "timer": {
-                        "absoluteHourToStop": int(hour),
-                        "absoluteMinuteToStop": int(minute)
-                    }
-                }
-            except (IndexError, ValueError) as e:
-                return {"error": f"유효하지 않은 aircon_timer_stop 포맷입니다. 'aircon_timer_stop_HHMM' 형식으로 입력하세요."}
-        else:
-            return {"error": f"Unknown action: {action}"}
-
+        # LG API 호출
         result = await control_lg_device(device_id, command)
         return result
 
